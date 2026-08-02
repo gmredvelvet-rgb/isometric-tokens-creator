@@ -1,0 +1,270 @@
+/* Isometric Token Creator — controles reutilizables. */
+
+/* ══════════════ Botones ══════════════ */
+
+.itc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  font-family: var(--itc-font);
+  font-size: var(--itc-fs);
+  font-weight: 600;
+  color: var(--itc-text);
+  background: var(--itc-surface-3);
+  border: 1px solid var(--itc-border);
+  border-radius: var(--itc-radius);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+
+.itc-btn:hover:not(:disabled) {
+  background: var(--itc-elevated);
+  border-color: var(--itc-border-strong);
+}
+
+.itc-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.itc-btn--ghost {
+  background: transparent;
+}
+
+.itc-btn--primary {
+  color: #1a1206;
+  background: var(--itc-accent);
+  border-color: var(--itc-accent);
+}
+
+.itc-btn--primary:hover:not(:disabled) {
+  background: var(--itc-accent-hover);
+  border-color: var(--itc-accent-hover);
+}
+
+.itc-btn--accent {
+  color: var(--itc-text);
+  background: var(--itc-surface-3);
+  border-color: var(--itc-border-strong);
+}
+
+.itc-btn--lg {
+  height: 40px;
+  font-size: var(--itc-fs-lg);
+}
+
+.itc-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--itc-text-faint);
+  background: transparent;
+  border: none;
+  border-radius: var(--itc-radius-sm);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.itc-icon-btn:hover {
+  color: var(--itc-danger);
+  background: var(--itc-surface-3);
+}
+
+/* ══════════════ Control numérico ══════════════ */
+
+.itc-number {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.itc-number__label {
+  font-size: var(--itc-fs-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--itc-text-faint);
+  cursor: ns-resize;
+  user-select: none;
+}
+
+.itc-number__label:hover {
+  color: var(--itc-text-dim);
+}
+
+.itc-number__row {
+  display: flex;
+  align-items: center;
+  gap: var(--itc-gap-sm);
+}
+
+.itc-number__range {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 4px;
+  margin: 0;
+  appearance: none;
+  background: var(--itc-surface-3);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.itc-number__range::-webkit-slider-thumb {
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  background: var(--itc-text-dim);
+  border: none;
+  border-radius: 50%;
+  cursor: grab;
+  transition: background 0.12s ease;
+}
+
+.itc-number__range::-webkit-slider-thumb:hover {
+  background: var(--itc-accent);
+}
+
+.itc-number__range::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  background: var(--itc-text-dim);
+  border: none;
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.itc-number__spin {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  background: var(--itc-surface-3);
+  border: 1px solid var(--itc-border);
+  border-radius: var(--itc-radius-sm);
+  overflow: hidden;
+}
+
+.itc-number__btn {
+  width: 22px;
+  height: 24px;
+  font-size: var(--itc-fs-lg);
+  line-height: 1;
+  color: var(--itc-text-dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.itc-number__btn:hover {
+  color: var(--itc-accent);
+  background: var(--itc-elevated);
+}
+
+.itc-number__input {
+  width: 52px;
+  height: 24px;
+  padding: 0 4px;
+  text-align: center;
+  font-family: var(--itc-font-mono);
+  font-size: var(--itc-fs-sm);
+  color: var(--itc-text);
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--itc-border-soft);
+  border-right: 1px solid var(--itc-border-soft);
+}
+
+.itc-number__input:focus {
+  outline: none;
+  background: var(--itc-bg);
+  color: var(--itc-accent);
+}
+
+/* Ocultar los steppers nativos: ya tenemos los nuestros. */
+.itc-number__input::-webkit-outer-spin-button,
+.itc-number__input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.itc-number__input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.itc-number__unit {
+  padding: 0 6px;
+  font-size: var(--itc-fs-xs);
+  color: var(--itc-text-faint);
+}
+
+/* ══════════════ Casillas, selectores y color ══════════════ */
+
+.itc-check {
+  display: flex;
+  align-items: center;
+  gap: var(--itc-gap-sm);
+  padding: 4px 0;
+  font-size: var(--itc-fs);
+  color: var(--itc-text-dim);
+  cursor: pointer;
+}
+
+.itc-check input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--itc-accent);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.itc-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--itc-gap-sm);
+  font-size: var(--itc-fs-sm);
+  color: var(--itc-text-dim);
+}
+
+.itc-select select {
+  flex: 0 0 auto;
+  width: 120px;
+  height: 26px;
+  padding: 0 6px;
+  font-size: var(--itc-fs-sm);
+  color: var(--itc-text);
+  background: var(--itc-surface-3);
+  border: 1px solid var(--itc-border);
+  border-radius: var(--itc-radius-sm);
+}
+
+.itc-color {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--itc-gap-sm);
+  font-size: var(--itc-fs-sm);
+  color: var(--itc-text-dim);
+}
+
+.itc-color input[type="color"] {
+  width: 44px;
+  height: 26px;
+  padding: 2px;
+  background: var(--itc-surface-3);
+  border: 1px solid var(--itc-border);
+  border-radius: var(--itc-radius-sm);
+  cursor: pointer;
+}
+
+.itc-inline-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--itc-gap-sm);
+}

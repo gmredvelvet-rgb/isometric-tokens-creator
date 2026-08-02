@@ -1,0 +1,162 @@
+/* Isometric Token Creator — viewport y su superposición. */
+
+.itc-viewport__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--itc-gap);
+  padding-bottom: var(--itc-gap-sm);
+  border-bottom: 1px solid var(--itc-border-soft);
+}
+
+.itc-viewport__bar .itc-panel__title {
+  padding: 0;
+  border: none;
+}
+
+.itc-viewport__tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.itc-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: var(--itc-fs);
+  color: var(--itc-text-dim);
+  background: var(--itc-surface-2);
+  border: 1px solid var(--itc-border-soft);
+  border-radius: var(--itc-radius);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.itc-tool:hover:not(:disabled) {
+  color: var(--itc-text);
+  background: var(--itc-surface-3);
+  border-color: var(--itc-border-strong);
+}
+
+.itc-tool.active {
+  color: var(--itc-accent);
+  border-color: var(--itc-accent);
+  background: var(--itc-accent-dim);
+}
+
+.itc-tool:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.itc-sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--itc-border);
+}
+
+/* ══════════════ Área del canvas ══════════════ */
+
+.itc-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: var(--itc-gap-sm) 0;
+  background: var(--itc-bg);
+  border: 1px solid var(--itc-border-soft);
+  border-radius: var(--itc-radius);
+  overflow: hidden;
+}
+
+.itc-viewport__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.itc-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+/* ══════════════ Leyenda de ejes ══════════════ */
+
+.itc-axis-legend {
+  position: absolute;
+  top: var(--itc-gap-sm);
+  right: var(--itc-gap-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  font-size: var(--itc-fs-xs);
+  color: var(--itc-text-dim);
+  background: rgba(20, 22, 26, 0.85);
+  border: 1px solid var(--itc-border);
+  border-radius: var(--itc-radius);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.itc-axis-legend strong {
+  font-size: var(--itc-fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--itc-text-faint);
+  margin-bottom: 2px;
+}
+
+.itc-axis-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.itc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.itc-dot--x {
+  background: var(--itc-axis-x);
+}
+
+.itc-dot--y {
+  background: var(--itc-axis-y);
+}
+
+.itc-dot--z {
+  background: var(--itc-axis-z);
+}
+
+/* ══════════════ Pie del viewport ══════════════ */
+
+.itc-viewport__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--itc-gap);
+  padding-top: var(--itc-gap-sm);
+  border-top: 1px solid var(--itc-border-soft);
+}
+
+.itc-viewport__history {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.itc-viewport__tip {
+  margin: 0;
+  font-size: var(--itc-fs-xs);
+  color: var(--itc-text-faint);
+  text-align: right;
+}

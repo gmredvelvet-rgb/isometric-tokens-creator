@@ -1,0 +1,51 @@
+{
+  "id": "isometric-tokens-creator",
+  "title": "Isometric Token Creator",
+  "description": "Editor visual para componer tokens isométricos (base + personaje + sombra) y exportarlos como PNG transparente perfectamente alineado con isometric-perspective. Compatible con D&D5e, PF2e y cualquier sistema.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "GMRedVelvet"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/itc-variables.css",
+    "styles/itc-app.css",
+    "styles/itc-panels.css",
+    "styles/itc-widgets.css",
+    "styles/itc-viewport.css",
+    "styles/itc-license.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "lang/es.json"
+    }
+  ],
+  "relationships": {
+    "recommends": [
+      {
+        "id": "isometric-perspective",
+        "type": "module",
+        "reason": "Aplica la proyección isométrica en el canvas. ITC lee su proyección para alinear los tokens exportados."
+      }
+    ]
+  },
+  "socket": false,
+  "url": "https://github.com/gmredvelvet-rgb/isometric-tokens-creator",
+  "manifest": "https://github.com/gmredvelvet-rgb/isometric-tokens-creator/releases/latest/download/module.json",
+  "download": "https://github.com/gmredvelvet-rgb/isometric-tokens-creator/releases/latest/download/module.zip"
+}

@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "categories": [
+    {
+      "id": "stone",
+      "label": "ITC.BaseCat.Stone",
+      "icon": "fa-cube"
+    },
+    {
+      "id": "wood",
+      "label": "ITC.BaseCat.Wood",
+      "icon": "fa-tree"
+    },
+    {
+      "id": "snow",
+      "label": "ITC.BaseCat.Snow",
+      "icon": "fa-snowflake"
+    },
+    {
+      "id": "lava",
+      "label": "ITC.BaseCat.Lava",
+      "icon": "fa-fire"
+    },
+    {
+      "id": "sand",
+      "label": "ITC.BaseCat.Sand",
+      "icon": "fa-hourglass"
+    },
+    {
+      "id": "metal",
+      "label": "ITC.BaseCat.Metal",
+      "icon": "fa-shield-halved"
+    }
+  ],
+  "bases": [
+    {
+      "id": "stone-01",
+      "category": "stone",
+      "label": "ITC.Base.Stone01",
+      "src": "assets/bases/stone/stone-01.png",
+      "thumb": null,
+      "contact": {
+        "cx": 0.5,
+        "cy": 0.5,
+        "rx": 0.48828125,
+        "ry": 0.281909311127747
+      },
+      "ratio": 1.7320508075688772
+    },
+    {
+      "id": "wood-01",
+      "category": "wood",
+      "label": "ITC.Base.Wood01",
+      "src": "assets/bases/wood/wood-01.png",
+      "thumb": null,
+      "contact": {
+        "cx": 0.5,
+        "cy": 0.5,
+        "rx": 0.48828125,
+        "ry": 0.281909311127747
+      },
+      "ratio": 1.7320508075688772
+    },
+    {
+      "id": "snow-01",
+      "category": "snow",
+      "label": "ITC.Base.Snow01",
+      "src": "assets/bases/snow/snow-01.png",
+      "thumb": null,
+      "contact": {
+        "cx": 0.5,
+        "cy": 0.5,
+        "rx": 0.48828125,
+        "ry": 0.281909311127747
+      },
+      "ratio": 1.7320508075688772
+    },
+    {
+      "id": "lava-01",
+      "category": "lava",
+      "label": "ITC.Base.Lava01",
+      "src": "assets/bases/lava/lava-01.png",
+      "thumb": null,
+      "contact": {
+        "cx": 0.5,
+        "cy": 0.5,
+        "rx": 0.48828125,
+        "ry": 0.281909311127747
+      },
+      "ratio": 1.7320508075688772
+    },
+    {
+      "id": "sand-01",
+      "category": "sand",
+      "label": "ITC.Base.Sand01",
+      "src": "assets/bases/sand/sand-01.png",
+      "thumb": null,
+      "contact": {
+        "cx": 0.5,
+        "cy": 0.5,
+        "rx": 0.48828125,
+        "ry": 0.281909311127747
+      },
+      "ratio": 1.7320508075688772
+    },
+    {
+      "id": "metal-01",
+      "category": "metal",
+      "label": "ITC.Base.Metal01",
+      "src": "assets/bases/metal/metal-01.png",
+      "thumb": null,
+      "contact": {
+        "cx": 0.5,
+        "cy": 0.5,
+        "rx": 0.48828125,
+        "ry": 0.281909311127747
+      },
+      "ratio": 1.7320508075688772
+    }
+  ]
+}

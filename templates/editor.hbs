@@ -1,0 +1,338 @@
+{{!-- Isometric Token Creator — shell del editor.
+
+     Se renderiza una sola vez. A partir de ahí el editor actualiza nodos
+     concretos en lugar de re-renderizar la plantilla, que es lo que permite
+     arrastrar los gizmos a 60 fps. --}}
+
+<div class="itc-layout">
+
+  {{!-- ══════════════ CABECERA ══════════════ --}}
+  <header class="itc-header">
+    <div class="itc-header__brand">
+      <i class="fas fa-cube itc-header__icon"></i>
+      <div class="itc-header__titles">
+        <h1>{{localize "ITC.Title"}}</h1>
+        <p>{{localize "ITC.Subtitle"}}</p>
+      </div>
+    </div>
+
+    <div class="itc-header__status">
+      {{#if hasIsoPerspective}}
+        <span class="itc-badge itc-badge--ok" data-tooltip="{{localize 'ITC.Status.BridgeActiveHint'}}">
+          <i class="fas fa-link"></i> {{projectionLabel}} · ratio {{ratioLabel}}
+        </span>
+      {{else}}
+        <span class="itc-badge itc-badge--warn" data-tooltip="{{localize 'ITC.Status.NoBridgeHint'}}">
+          <i class="fas fa-unlink"></i> {{localize "ITC.Status.NoBridge"}}
+        </span>
+      {{/if}}
+
+      <span class="itc-badge itc-badge--system"
+            data-tooltip="{{#if hasSystemSupport}}{{localize 'ITC.Status.SystemSupported'}}{{else}}{{localize 'ITC.Status.SystemGeneric'}}{{/if}}">
+        <i class="fas fa-dice-d20"></i> {{systemLabel}}
+      </span>
+    </div>
+  </header>
+
+  <div class="itc-body">
+
+    {{!-- ══════════════ COLUMNA IZQUIERDA ══════════════ --}}
+    <aside class="itc-col itc-col--left">
+
+      {{!-- 1. Bases --}}
+      <section class="itc-panel">
+        <h2 class="itc-panel__title"><span class="itc-step">1</span> {{localize "ITC.Panel.Bases"}}</h2>
+
+        <div class="itc-chips">
+          {{#each categories}}
+            <button type="button"
+                    class="itc-chip {{#if (eq id ../activeCategory)}}active{{/if}}"
+                    data-action="selectCategory"
+                    data-category-id="{{id}}">
+              <i class="fas {{icon}}"></i> {{label}}
+            </button>
+          {{/each}}
+        </div>
+
+        <div class="itc-base-grid">
+          {{#each bases}}
+            <button type="button"
+                    class="itc-base {{#if selected}}selected{{/if}}"
+                    data-action="selectBase"
+                    data-base-id="{{id}}"
+                    data-tooltip="{{label}}">
+              <img src="{{#if thumb}}{{thumb}}{{else}}{{src}}{{/if}}" alt="{{label}}" loading="lazy">
+            </button>
+          {{else}}
+            <p class="itc-empty">{{localize "ITC.Bases.Empty"}}</p>
+          {{/each}}
+        </div>
+
+        <button type="button" class="itc-btn itc-btn--ghost" data-action="importBase">
+          <i class="fas fa-folder-plus"></i> {{localize "ITC.Bases.Import"}}
+        </button>
+      </section>
+
+      {{!-- 2. Importar personaje --}}
+      <section class="itc-panel">
+        <h2 class="itc-panel__title"><span class="itc-step">2</span> {{localize "ITC.Panel.Import"}}</h2>
+
+        <div class="itc-dropzone">
+          <i class="fas fa-cloud-arrow-up"></i>
+          <p>{{localize "ITC.Import.DropHere"}}</p>
+          <small>{{localize "ITC.Import.OrClick"}}</small>
+        </div>
+
+        <button type="button" class="itc-btn itc-btn--primary" data-action="pickArtwork">
+          <i class="fas fa-folder-open"></i> {{localize "ITC.Import.Browse"}}
+        </button>
+        <p class="itc-hint">{{localize "ITC.Import.Formats"}}</p>
+
+        <div class="itc-file-chip {{#unless project.assets.artwork.src}}hidden{{/unless}}" data-file-chip>
+          <img data-file-thumb src="{{project.assets.artwork.src}}" alt="">
+          <div class="itc-file-chip__meta">
+            <span data-file-name>{{project.name}}</span>
+            <small data-file-size>
+              {{project.assets.artwork.originalSize.w}}×{{project.assets.artwork.originalSize.h}}px
+            </small>
+          </div>
+          <button type="button" class="itc-icon-btn" data-action="clearArtwork"
+                  data-tooltip="{{localize 'ITC.Import.Clear'}}">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+
+        {{!-- Selector de fotograma: sólo para orígenes de vídeo (WebM, MP4).
+              La exportación es un PNG estático, así que hay que elegir qué
+              instante se congela. --}}
+        <div class="itc-video-frame {{#unless project.assets.artwork.isVideo}}hidden{{/unless}}"
+             data-video-frame>
+          <p class="itc-video-frame__note">
+            <i class="fas fa-film"></i> {{localize "ITC.Import.VideoNote"}}
+          </p>
+          <itc-number label="{{localize 'ITC.Field.VideoFrame'}}"
+                      path="assets.artwork.frameTime"
+                      min="0" max="100" step="1" unit="%" precision="0" factor="100"></itc-number>
+        </div>
+      </section>
+    </aside>
+
+    {{!-- ══════════════ CENTRO · VIEWPORT ══════════════ --}}
+    <main class="itc-col itc-col--center">
+      <section class="itc-panel itc-panel--viewport">
+        <header class="itc-viewport__bar">
+          <h2 class="itc-panel__title">{{localize "ITC.Panel.Viewport"}}</h2>
+          <div class="itc-viewport__tools">
+            <button type="button" class="itc-tool" data-action="zoomFit"
+                    data-tooltip="{{localize 'ITC.Tool.ZoomFit'}}">
+              <i class="fas fa-expand"></i>
+            </button>
+            <button type="button" class="itc-tool" data-action="autoFit"
+                    data-tooltip="{{localize 'ITC.Tool.AutoFit'}}">
+              <i class="fas fa-wand-magic-sparkles"></i>
+            </button>
+            <button type="button" class="itc-tool" data-action="flipH"
+                    data-tooltip="{{localize 'ITC.Tool.FlipH'}}">
+              <i class="fas fa-arrows-left-right"></i>
+            </button>
+            <button type="button" class="itc-tool" data-action="flipV"
+                    data-tooltip="{{localize 'ITC.Tool.FlipV'}}">
+              <i class="fas fa-arrows-up-down"></i>
+            </button>
+            <button type="button" class="itc-tool {{#if showGrid}}active{{/if}}" data-action="toggleGrid"
+                    data-tooltip="{{localize 'ITC.Tool.Grid'}}">
+              <i class="fas fa-border-all"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="itc-viewport">
+          <div class="itc-viewport__canvas"></div>
+
+          <div class="itc-axis-legend">
+            <strong>{{localize "ITC.Axes.Title"}}</strong>
+            <span><i class="itc-dot itc-dot--z"></i> Z · {{localize "ITC.Axes.Z"}}</span>
+            <span><i class="itc-dot itc-dot--y"></i> Y · {{localize "ITC.Axes.Y"}}</span>
+            <span><i class="itc-dot itc-dot--x"></i> X · {{localize "ITC.Axes.X"}}</span>
+          </div>
+        </div>
+
+        <footer class="itc-viewport__foot">
+          <div class="itc-viewport__history">
+            <button type="button" class="itc-tool" data-action="undo"
+                    data-tooltip="{{localize 'ITC.Tool.Undo'}}">
+              <i class="fas fa-rotate-left"></i>
+            </button>
+            <button type="button" class="itc-tool" data-action="redo"
+                    data-tooltip="{{localize 'ITC.Tool.Redo'}}">
+              <i class="fas fa-rotate-right"></i>
+            </button>
+            <span class="itc-sep"></span>
+            <button type="button" class="itc-tool" data-action="centerArtwork"
+                    data-tooltip="{{localize 'ITC.Tool.Center'}}">
+              <i class="fas fa-crosshairs"></i>
+            </button>
+            <button type="button" class="itc-tool" data-action="resetTransform"
+                    data-tooltip="{{localize 'ITC.Tool.Reset'}}">
+              <i class="fas fa-arrows-rotate"></i>
+            </button>
+          </div>
+          <p class="itc-viewport__tip">{{localize "ITC.Viewport.Tip"}}</p>
+        </footer>
+      </section>
+    </main>
+
+    {{!-- ══════════════ COLUMNA DERECHA · INSPECTOR ══════════════ --}}
+    <aside class="itc-col itc-col--right">
+
+      {{!-- 3. Personaje --}}
+      <section class="itc-panel">
+        <h2 class="itc-panel__title"><span class="itc-step">3</span> {{localize "ITC.Panel.Character"}}</h2>
+
+        <div class="itc-group">
+          <h3 class="itc-group__title">{{localize "ITC.Field.Position"}}</h3>
+          <itc-number label="{{localize 'ITC.Field.PosX'}}" path="artwork.x"
+                      min="-512" max="512" step="1" precision="0" slider="false"></itc-number>
+          <itc-number label="{{localize 'ITC.Field.PosY'}}" path="artwork.y"
+                      min="-512" max="512" step="1" precision="0" slider="false"></itc-number>
+          <itc-number label="{{localize 'ITC.Field.PosZ'}}" path="artwork.z"
+                      min="-512" max="512" step="1" precision="0" slider="false"></itc-number>
+        </div>
+
+        <itc-number label="{{localize 'ITC.Field.Scale'}}" path="artwork.scale"
+                    min="5" max="400" step="1" unit="%" precision="0" factor="100"></itc-number>
+
+        <itc-number label="{{localize 'ITC.Field.Rotation'}}" path="artwork.rotation"
+                    min="-180" max="180" step="1" unit="°" precision="0"></itc-number>
+
+        <itc-number label="{{localize 'ITC.Field.Opacity'}}" path="artwork.opacity"
+                    min="0" max="100" step="1" unit="%" precision="0" factor="100"></itc-number>
+
+        <div class="itc-inline-actions">
+          <button type="button" class="itc-btn itc-btn--ghost" data-action="flipH">
+            <i class="fas fa-arrows-left-right"></i> {{localize "ITC.Field.FlipH"}}
+          </button>
+          <button type="button" class="itc-btn itc-btn--ghost" data-action="flipV">
+            <i class="fas fa-arrows-up-down"></i> {{localize "ITC.Field.FlipV"}}
+          </button>
+        </div>
+      </section>
+
+      {{!-- 4. Base --}}
+      <section class="itc-panel">
+        <h2 class="itc-panel__title"><span class="itc-step">4</span> {{localize "ITC.Panel.Base"}}</h2>
+
+        <itc-number label="{{localize 'ITC.Field.BaseScale'}}" path="base.scale"
+                    min="10" max="200" step="1" unit="%" precision="0" factor="100"></itc-number>
+
+        <itc-number label="{{localize 'ITC.Field.BaseRotation'}}" path="base.rotation"
+                    min="-180" max="180" step="1" unit="°" precision="0"></itc-number>
+
+        <itc-number label="{{localize 'ITC.Field.BaseElevation'}}" path="base.elevation"
+                    min="-256" max="256" step="1" precision="0"></itc-number>
+
+        <itc-number label="{{localize 'ITC.Field.BaseOpacity'}}" path="base.opacity"
+                    min="0" max="100" step="1" unit="%" precision="0" factor="100"></itc-number>
+
+        <label class="itc-check">
+          <input type="checkbox" data-path="base.visible" {{checked project.base.visible}}>
+          <span>{{localize "ITC.Field.BaseVisible"}}</span>
+        </label>
+      </section>
+
+      {{!-- 5. Sombra --}}
+      <section class="itc-panel">
+        <h2 class="itc-panel__title"><span class="itc-step">5</span> {{localize "ITC.Panel.Shadow"}}</h2>
+
+        <label class="itc-check">
+          <input type="checkbox" data-path="shadow.enabled" {{checked project.shadow.enabled}}>
+          <span>{{localize "ITC.Field.ShadowEnabled"}}</span>
+        </label>
+
+        <itc-number label="{{localize 'ITC.Field.ShadowIntensity'}}" path="shadow.intensity"
+                    min="0" max="100" step="1" unit="%" precision="0" factor="100"></itc-number>
+
+        <itc-number label="{{localize 'ITC.Field.ShadowBlur'}}" path="shadow.blur"
+                    min="0" max="40" step="1" precision="0"></itc-number>
+
+        <div class="itc-group">
+          <itc-number label="{{localize 'ITC.Field.ShadowOffsetX'}}" path="shadow.offsetX"
+                      min="-128" max="128" step="1" precision="0" slider="false"></itc-number>
+          <itc-number label="{{localize 'ITC.Field.ShadowOffsetY'}}" path="shadow.offsetY"
+                      min="-128" max="128" step="1" precision="0" slider="false"></itc-number>
+        </div>
+
+        <label class="itc-color">
+          <span>{{localize "ITC.Field.ShadowColor"}}</span>
+          <input type="color" data-shadow-color value="#000000">
+        </label>
+      </section>
+
+      {{!-- 6. Exportación --}}
+      <section class="itc-panel">
+        <h2 class="itc-panel__title"><span class="itc-step">6</span> {{localize "ITC.Panel.Export"}}</h2>
+
+        <label class="itc-select">
+          <span>{{localize "ITC.Field.ExportSize"}}</span>
+          <select data-path="export.size" data-type="number">
+            {{#each exportSizes}}
+              <option value="{{this}}" {{#if (eq this ../project.export.size)}}selected{{/if}}>
+                {{this}} × {{this}}
+              </option>
+            {{/each}}
+          </select>
+        </label>
+
+        <label class="itc-select">
+          <span>{{localize "ITC.Field.ExportFormat"}}</span>
+          <select data-path="export.format">
+            <option value="png" {{#if (eq project.export.format "png")}}selected{{/if}}>PNG</option>
+            <option value="webp" {{#if (eq project.export.format "webp")}}selected{{/if}}>WebP</option>
+          </select>
+        </label>
+
+        {{#unless canUpload}}
+          <p class="itc-hint itc-hint--warn">
+            <i class="fas fa-triangle-exclamation"></i> {{localize "ITC.Export.NoUploadPermission"}}
+          </p>
+        {{/unless}}
+      </section>
+    </aside>
+  </div>
+
+  {{!-- ══════════════ PIE ══════════════ --}}
+  <footer class="itc-footer">
+    <div class="itc-footer__name">
+      <label>{{localize "ITC.Field.TokenName"}}</label>
+      <input type="text" data-name-input value="{{project.name}}"
+             placeholder="{{localize 'ITC.Field.TokenNamePlaceholder'}}">
+    </div>
+
+    <div class="itc-footer__preview">
+      <label>{{localize "ITC.Preview.Final"}}</label>
+      <canvas data-preview-final width="256" height="256"></canvas>
+    </div>
+
+    <div class="itc-footer__preview">
+      <label>{{localize "ITC.Preview.InFoundry"}}</label>
+      <canvas data-preview-scene width="256" height="256"></canvas>
+    </div>
+
+    <div class="itc-footer__actions">
+      <div class="itc-footer__row">
+        <button type="button" class="itc-btn itc-btn--ghost" data-action="openProject">
+          <i class="fas fa-folder-open"></i> {{localize "ITC.Action.Open"}}
+        </button>
+        <button type="button" class="itc-btn itc-btn--ghost" data-action="saveProject">
+          <i class="fas fa-floppy-disk"></i> {{localize "ITC.Action.Save"}}
+        </button>
+      </div>
+      <button type="button" class="itc-btn itc-btn--primary itc-btn--lg" data-action="applyToken">
+        <i class="fas fa-wand-magic-sparkles"></i> {{localize "ITC.Action.Apply"}}
+      </button>
+      <button type="button" class="itc-btn itc-btn--accent" data-action="exportImage">
+        <i class="fas fa-download"></i> {{localize "ITC.Action.Export"}}
+      </button>
+    </div>
+  </footer>
+</div>
