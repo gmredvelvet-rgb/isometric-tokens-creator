@@ -1,7 +1,7 @@
 {
   "id": "isometric-tokens-creator",
   "title": "Isometric Token Creator",
-  "description": "Editor visual para componer tokens isométricos (base + personaje + sombra) y exportarlos como PNG transparente perfectamente alineado con isometric-perspective. Compatible con D&D5e, PF2e y cualquier sistema.",
+  "description": "Visual editor for composing isometric tokens (base + character + shadow) and exporting them as transparent PNGs aligned to the isometric-perspective projection. Works with D&D 5e, Pathfinder 2e, and system-agnostic worlds. Early Access.",
   "version": "1.0.0",
   "compatibility": {
     "minimum": "13",
@@ -40,7 +40,7 @@
       {
         "id": "isometric-perspective",
         "type": "module",
-        "reason": "Aplica la proyección isométrica en el canvas. ITC lee su proyección para alinear los tokens exportados."
+        "reason": "Applies the isometric projection to the canvas. ITC reads that projection to align exported tokens."
       }
     ]
   },

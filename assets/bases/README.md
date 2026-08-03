@@ -1,67 +1,65 @@
-# Bases (peanas)
+# Bases
 
-Suelta aquí tus PNG y aparecerán en el selector del editor. **No hace falta
-editar ningún fichero**: el módulo escanea estas carpetas al arrancar el mundo.
+Drop your PNGs in here and they show up in the editor's picker. There is no index file
+to edit — the module scans these folders when the world starts.
 
 ```
 assets/bases/
-├── stone/     ← piedra
-├── wood/      ← madera
-├── snow/      ← nieve
-├── lava/      ← lava
-├── sand/      ← arena
-├── metal/     ← metal
-├── custom/    ← lo que no encaje en las anteriores
-└── bases.json ← opcional: sólo para declarar el punto de contacto exacto
+├── stone/
+├── wood/
+├── snow/
+├── lava/
+├── sand/
+├── metal/
+├── custom/     ← anything that doesn't fit the categories above
+└── bases.json  ← optional, only needed to declare an exact contact point
 ```
 
-La categoría la determina la carpeta. El nombre visible se deduce del nombre
-del archivo (`stone-cobbles-01.png` → «Stone Cobbles 01»).
+The folder decides the category. The display name comes from the filename
+(`stone-cobbles-01.png` → "Stone Cobbles 01").
 
-Formatos aceptados: PNG, WebP, JPG, GIF. **Usa PNG con transparencia real.**
+Accepted formats: PNG, WebP, JPG, GIF. **Use PNG with real transparency.**
 
-Tras copiar archivos, recarga el mundo (F5) para que se detecten.
+Reload the world (F5) after adding files so they get picked up.
 
 ---
 
-## Cómo debe estar dibujada una base
+## How a base needs to be drawn
 
-El módulo alinea la peana por su **elipse de contacto**: la zona donde toca el
-suelo. Para que el token encaje en la celda isométrica sin correcciones
-manuales, esa elipse debe cumplir:
+The module aligns a base by its **contact ellipse** — the part that meets the ground.
+For the token to sit in an isometric cell without manual correction, that ellipse has
+to satisfy:
 
-> **ancho / alto = `ratio` de la proyección**
+> **width / height = the projection's `ratio`**
 >
-> - True Isometric → **√3 ≈ 1.7320** (la más habitual)
+> - True Isometric → **√3 ≈ 1.7320** (the common case)
 > - Dimetric (2:1) → 2.0
 > - Overhead (√2:1) → 1.4142
 > - Projection (3:2) → 1.5
 
-Con `ratio = √3`, una elipse de 1000 px de ancho debe medir **577 px de alto**.
+At `ratio = √3`, an ellipse 1000 px wide needs to be **577 px tall**.
 
-Si la elipse no cumple la proporción, la base se verá bien en el editor pero el
-token quedará ligeramente desalineado sobre la rejilla de la escena. Con el
-**modo depuración** activado (ajustes del módulo), el editor avisa en consola
-con el valor concreto que ha encontrado.
+Get the proportion wrong and the base will look fine in the editor while the token sits
+slightly off the scene grid. Turn on **debug mode** in the module settings and the
+editor will report the value it actually measured in the console.
 
-### Consejo práctico
+### Practical advice
 
-Lo más sencillo es dibujar la base en un **lienzo cuadrado**, con la elipse
-centrada y ocupando todo el ancho. Ésa es la convención que el módulo asume
-cuando no puede determinar nada mejor.
+The simplest approach is to draw the base on a **square canvas**, ellipse centred and
+spanning the full width. That is the convention the module assumes when it has nothing
+better to go on.
 
-Si tu peana tiene grosor lateral, borde decorativo o perspectiva propia, el
-centro de la elipse **no** coincidirá con el centro de la imagen. En ese caso
-el módulo lo estima automáticamente a partir del recuadro alfa la primera vez
-que seleccionas la base. Si la estimación no te convence, declárala a mano en
-`bases.json` (ver abajo).
+If your base has side thickness, a decorative rim, or perspective of its own, the centre
+of the ellipse will not line up with the centre of the image. The module estimates it
+from the alpha bounding box the first time you select the base. If the estimate is off,
+declare it by hand in `bases.json`.
 
 ---
 
-## bases.json (opcional)
+## bases.json (optional)
 
-Sólo hace falta si quieres control exacto sobre el punto de contacto, o
-etiquetas traducibles. Las bases no declaradas aquí funcionan igual.
+Only needed if you want exact control over the contact point, or translatable labels.
+Bases not listed here work fine.
 
 ```json
 {
@@ -73,7 +71,7 @@ etiquetas traducibles. Las bases no declaradas aquí funcionan igual.
     {
       "id": "stone-01",
       "category": "stone",
-      "label": "Adoquines de piedra",
+      "label": "Stone Cobbles",
       "src": "assets/bases/stone/stone-01.png",
       "contact": { "cx": 0.5, "cy": 0.5, "rx": 0.4883, "ry": 0.2819 },
       "ratio": 1.7320508
@@ -82,25 +80,25 @@ etiquetas traducibles. Las bases no declaradas aquí funcionan igual.
 }
 ```
 
-`contact` va **normalizado de 0 a 1** sobre las dimensiones de la imagen:
+`contact` is **normalised 0–1** against the image dimensions:
 
-| Campo | Significado |
+| Field | Meaning |
 |---|---|
-| `cx`, `cy` | centro de la elipse de contacto |
-| `rx` | semieje horizontal |
-| `ry` | semieje vertical (debe valer `rx / ratio` si la imagen es cuadrada) |
+| `cx`, `cy` | centre of the contact ellipse |
+| `rx` | horizontal semi-axis |
+| `ry` | vertical semi-axis (should equal `rx / ratio` on a square image) |
 
-`label` puede ser texto literal o una clave de traducción (`ITC.Base.…`)
-definida en `lang/es.json` y `lang/en.json`.
+`label` accepts either literal text or a translation key (`ITC.Base.…`) defined in
+`lang/en.json` and `lang/es.json`.
 
 ---
 
-## Regenerar las bases de ejemplo
+## Regenerating the sample bases
 
-Las bases incluidas se generan proceduralmente con geometría exacta:
+The bundled bases are generated procedurally with exact geometry:
 
 ```bash
 node tools/generate-bases.js assets/bases
 ```
 
-El script imprime la desviación respecto al `ratio` exigido, que debe ser cero.
+The script prints the deviation from the required `ratio`, which should be zero.

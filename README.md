@@ -1,187 +1,218 @@
 # Isometric Token Creator
 
-Editor visual para Foundry VTT v13 que compone **base + personaje + sombra** y
-exporta un PNG transparente **alineado con la proyección isométrica** de
+A visual editor for Foundry VTT v13 that composes **base + character + shadow** into a
+transparent PNG, aligned to the isometric projection used by
 [`isometric-perspective`](https://github.com/arlosmolten/isometric-perspective).
 
-Compatible con **D&D 5e**, **Pathfinder 2e** y cualquier sistema.
+Works with **D&D 5e**, **Pathfinder 2e**, and system-agnostic worlds.
+
+> **Early Access.** This is the first public build. It has been verified statically but
+> not yet exercised across a wide range of worlds — see [Early Access](#early-access)
+> before installing on a campaign you care about.
 
 ---
 
-## Qué resuelve
+## The problem
 
-Colocar arte de criatura sobre una peana isométrica a mano es tedioso y casi
-nunca queda alineado: el token flota, se hunde o sobresale de la celda. Este
-módulo compone la imagen y garantiza la alineación **por construcción**, sin
-que haya que tocar offsets manualmente.
+Placing creature art on an isometric base by hand is tedious, and the result is almost
+never quite right: the token floats above the cell, sinks into it, or spills over the
+edge. You end up nudging offsets until it looks acceptable, then doing it again for the
+next token.
 
-## La regla que lo hace funcionar
+This module composes the image and gets the alignment right by construction, so there
+are no offsets to tune.
 
-Leyendo el código de `isometric-perspective` se comprueba que la composición
-`stage × mesh` es una **escala pura alineada a los ejes**:
+## Why the alignment holds
+
+Reading through `isometric-perspective`, the `stage × mesh` composition turns out to be
+a pure axis-aligned scale:
 
 ```
-True Isometric →  diag(√6/2, √2/2)      cociente H/V = √3  = ratio
-Dimetric (2:1) →  diag(1.2649, 0.6325)  cociente H/V = 2.0 = ratio
+True Isometric →  diag(√6/2, √2/2)      H/V = √3  = ratio
+Dimetric (2:1) →  diag(1.2649, 0.6325)  H/V = 2.0 = ratio
 ```
 
-Es decir: el arte del token se ve **recto** en pantalla y ocupa un cuadrado
-cuyo ancho equivale a la diagonal horizontal del rombo de la celda.
+Token art therefore renders **upright** on screen, occupying a square whose width equals
+the horizontal diagonal of the cell's rhombus. Three rules follow directly:
 
-De ahí salen las tres reglas del exportador:
-
-| | Regla | Por qué |
+| | Rule | Reason |
 |---|---|---|
-| **R1** | Lienzo cuadrado | Con textura cuadrada, `sx = sy = 1` para *todos* los valores de `texture.fit`. Inmuniza el resultado frente a esa configuración, que es la causa más común de desalineación. |
-| **R2** | Elipse de contacto en el centro exacto | `isometric-perspective` sitúa el ancla del mesh en el centro de la celda, así que `offsetX = offsetY = 0` basta. |
-| **R3** | Aspecto de la elipse = `ratio : 1` | Para que la peana se superponga exactamente al rombo de la celda. |
+| **R1** | Square canvas | With a square texture, `sx = sy = 1` for every value of `texture.fit`. This makes the output immune to that setting, which is far and away the most common cause of misalignment. |
+| **R2** | Contact ellipse dead centre | `isometric-perspective` anchors the mesh at the centre of the cell, so `offsetX = offsetY = 0` is sufficient. |
+| **R3** | Ellipse aspect = `ratio : 1` | Makes the base sit exactly on the cell's rhombus. |
 
-El `Compositor` comprueba estas reglas con **aserciones ejecutables** (modo
-depuración), no sólo las documenta.
-
-La derivación completa está en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) §6.3.
+The `Compositor` enforces these with runtime assertions in debug mode rather than just
+documenting them. Full derivation in [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) §6.3.
 
 ---
 
-## Instalación
+## Requirements
 
-Copia la carpeta en `Data/modules/` y actívala en el mundo. No requiere
-compilación: es ESM nativo.
+- Foundry VTT **v13**
+- No build step — the module ships as native ESM
 
-**Dependencia blanda:** si `isometric-perspective` no está instalado, el editor
-funciona igual usando la proyección por defecto (True Isometric, `ratio = √3`).
+`isometric-perspective` is a **soft dependency**. Without it the editor still works,
+falling back to True Isometric (`ratio = √3`).
 
-## Uso
+## Installation
 
-Tres puntos de entrada:
+Paste the manifest URL into Foundry's module installer:
 
-- **Barra de controles de escena** → botón del cubo
-- **Cabecera de la ficha de actor** → «Crear token isométrico»
-- **HUD del token** seleccionado
+```
+https://github.com/gmredvelvet-rgb/isometric-tokens-creator/releases/latest/download/module.json
+```
 
-Flujo: elige base → importa el personaje (arrastrar o FilePicker) → ajusta →
-**Guardar token** o **Exportar imagen**.
+Or copy the folder into `Data/modules/` and enable it in your world.
 
-### Formatos de origen
+## Usage
 
-| Formato | Comportamiento |
+Three entry points:
+
+- Scene controls → the cube button
+- Actor sheet header → *Create isometric token*
+- Token HUD, with a token selected
+
+The flow is: pick a base, import the character (drag and drop, or the file picker),
+adjust, then **Save token** or **Export image**.
+
+### Source formats
+
+| Format | Behaviour |
 |---|---|
-| PNG, WebP, JPG | Imagen estática |
-| GIF | Se usa **un solo fotograma** (el primero) |
-| **WebM, MP4, OGV** | Se extrae **un fotograma**, elegible con el deslizador |
+| PNG, WebP, JPG | Used as-is |
+| GIF | First frame only |
+| WebM, MP4, OGV | One frame, chosen with a slider |
 
-La salida siempre es un **PNG (o WebP) estático**. Al importar un vídeo aparece
-un selector de *Fotograma* en el panel de importación: por defecto se toma el
-del **25 %** de la duración, porque muchos WebM de efectos empiezan en negro o
-completamente transparentes y el primer fotograma sería inútil.
+Output is always a static PNG or WebP.
 
-El canal alfa del WebM (VP8/VP9) se conserva, así que los packs de tokens
-animados con transparencia funcionan bien como origen.
+Importing a video adds a *Frame* control to the import panel. It defaults to 25% into
+the clip rather than the first frame, because a lot of effect WebMs open on black or on
+full transparency, which would give you nothing to work with. The WebM alpha channel
+(VP8/VP9) is preserved, so animated token packs with transparency work well as sources.
 
-El fotograma elegido se guarda en el `.itcproj`: reabrir el proyecto reproduce
-exactamente la misma imagen.
+Your frame choice is stored in the `.itcproj` file, so reopening a project reproduces
+the same image.
 
-> Exportar tokens **animados** (APNG / WebP animado / WebM) sigue siendo Fase 6.
+> Exporting **animated** tokens (APNG, animated WebP, WebM) is planned for Phase 6.
 
-### Atajos
+### Shortcuts
 
-| Acción | Atajo |
+| Action | Shortcut |
 |---|---|
-| Deshacer / Rehacer | `Ctrl+Z` / `Ctrl+Shift+Z` |
-| Guardar proyecto | `Ctrl+S` |
-| Cancelar arrastre | `Esc` |
-| Desplazar vista | `Mayús` + arrastrar, o botón central |
-| Zoom | rueda del ratón |
-| Anular ajuste magnético | mantener `Alt` |
-| Paso ×10 / ÷10 en los `±` | `Mayús` / `Alt` |
-| Restablecer un control | doble clic en su etiqueta |
+| Undo / Redo | `Ctrl+Z` / `Ctrl+Shift+Z` |
+| Save project | `Ctrl+S` |
+| Cancel drag | `Esc` |
+| Pan | `Shift` + drag, or middle mouse |
+| Zoom | Mouse wheel |
+| Override snapping | Hold `Alt` |
+| Step ×10 / ÷10 on `±` controls | `Shift` / `Alt` |
+| Reset a control | Double-click its label |
 
 ---
 
-## Bases (peanas)
+## Bases
 
-Suelta tus PNG en `assets/bases/<categoría>/` y **aparecerán solas** en el
-selector: el módulo escanea las carpetas al arrancar el mundo, no hace falta
-editar ningún fichero. Detalles y requisitos geométricos en
-[`assets/bases/README.md`](assets/bases/README.md).
+Drop your PNGs into `assets/bases/<category>/` and they appear in the picker on their
+own — the module scans those folders at world startup, so there is no index file to
+maintain. Geometry requirements are in [`assets/bases/README.md`](assets/bases/README.md).
 
 ---
 
-## Compatibilidad entre sistemas
+## System compatibility
 
-El núcleo es **agnóstico**: produce una imagen y escribe campos estándar de
-Foundry (`texture.*`). Lo único específico de cada sistema es de dónde se lee
-el tamaño de la criatura, y eso vive aislado en `SystemAdapter`:
+The core is system-agnostic: it produces an image and writes standard Foundry
+`texture.*` fields. The only system-specific part is where creature size is read from,
+and that is isolated in `SystemAdapter`:
 
-| Sistema | Ruta del tamaño |
+| System | Size path |
 |---|---|
-| PF2e | `actor.system.traits.size.value` (objeto) |
+| PF2e | `actor.system.traits.size.value` (object) |
 | D&D 5e | `actor.system.traits.size` (string) |
-| Genérico | acepta ambas formas |
+| Generic | Accepts either shape |
 
-Añadir otro sistema no requiere tocar el módulo:
+Adding another system does not require touching the module:
 
 ```js
-class MiSistema extends game.itc.BaseSystemAdapter {
-  static systemId = "mi-sistema";
-  getSizeKey(actor) { return actor.system.tamaño; }
+class MySystem extends game.itc.BaseSystemAdapter {
+  static systemId = "my-system";
+  getSizeKey(actor) { return actor.system.size; }
 }
-game.itc.registerSystemAdapter(MiSistema);
+game.itc.registerSystemAdapter(MySystem);
 ```
 
 ---
 
 ## API
 
-Disponible en `game.itc` y en `game.modules.get("isometric-tokens-creator").api`.
+Exposed on `game.itc` and on `game.modules.get("isometric-tokens-creator").api`.
 
 ```js
-await game.itc.open();                     // abrir el editor
-await game.itc.open({ actor });            // con sugerencias del actor
-await game.itc.openProject(ruta);          // abrir un .itcproj
-game.itc.getRatio();                       // ratio de la proyección activa
-game.itc.diagnostics();                    // informe del entorno
+await game.itc.open();                     // open the editor
+await game.itc.open({ actor });            // prefilled from an actor
+await game.itc.openProject(path);          // open an .itcproj
+game.itc.getRatio();                       // active projection ratio
+game.itc.diagnostics();                    // environment report
 ```
 
 ### Hooks
 
-| Hook | Cancelable |
+| Hook | Cancellable |
 |---|---|
 | `isometric-tokens-creator.editorReady` | no |
 | `isometric-tokens-creator.projectChanged` | no |
-| `isometric-tokens-creator.beforeExport` | **sí** |
+| `isometric-tokens-creator.beforeExport` | **yes** |
 | `isometric-tokens-creator.afterExport` | no |
-| `isometric-tokens-creator.beforeApplyToken` | **sí** |
+| `isometric-tokens-creator.beforeApplyToken` | **yes** |
 | `isometric-tokens-creator.baseLibraryLoaded` | no |
 
 ---
 
-## Herramientas de desarrollo
+## Development tools
 
 ```bash
-node tools/verify-architecture.js .    # imports, exports, ciclos y capas
+node tools/verify-architecture.js .    # imports, exports, cycles, layering
 node tools/generate-bases.js assets/bases
 ```
 
-`verify-architecture.js` comprueba que todo import resuelva, que todo nombre
-importado exista realmente como export, que no haya ciclos, y que se respete la
-regla de capas (un nivel sólo importa de niveles iguales o inferiores).
+`verify-architecture.js` checks that every import resolves, that every imported name
+actually exists as an export, that there are no cycles, and that the layering rule holds
+(a layer may only import from layers at or below its own level).
 
 ---
 
-## Estado
+## Early Access
 
-Implementación completa de las fases 0–5 del documento de arquitectura:
-41 módulos ES, sin ciclos, sin imports muertos, capas verificadas.
+Phases 0–5 of the architecture document are implemented: 41 ES modules, no cycles, no
+dead imports, layering verified.
 
-**Todavía no se ha ejecutado dentro de Foundry.** La verificación hasta ahora
-es estática (sintaxis, resolución de imports, cobertura de traducciones,
-geometría de las bases). Las tres comprobaciones de la Fase 0 del documento
-—versión de PIXI y si `extract.canvas` es asíncrono, forma de
-`getSceneControlButtons` en v13, y namespace real de `FilePicker`— están
-resueltas defensivamente en el código, pero deben confirmarse en ejecución con
-`game.itc.diagnostics()`.
+**What that verification does not cover is runtime behaviour inside Foundry.** Everything
+checked so far is static — syntax, import resolution, translation coverage, base
+geometry. Three specific questions from Phase 0 are handled defensively in code but have
+not been confirmed against a live client:
 
-## Licencia
+- the PIXI version, and whether `extract.canvas` is async
+- the shape of `getSceneControlButtons` in v13
+- the real namespace of `FilePicker` in v13
+
+If any of them behaves differently than assumed, the failure will be loud and early
+rather than silent. Run `game.itc.diagnostics()` after enabling the module and it will
+tell you what it found.
+
+I am releasing it this way on purpose. The geometry is the hard part and it is settled;
+what remains is contact with the variety of setups people actually run. If you hit
+something, an issue with your Foundry version, game system, and the output of
+`game.itc.diagnostics()` is genuinely useful and will get fixed quickly.
+
+**[Report an issue →](https://github.com/gmredvelvet-rgb/isometric-tokens-creator/issues)**
+
+## Support
+
+Development is funded through [Patreon](https://www.patreon.com/gmredvelvet). Supporters
+get early builds and a direct line for bug reports and feature requests.
+
+The module itself is not gated: every feature works whether or not a licence is active.
+An unlicensed world sees an occasional reminder, and nothing else changes.
+
+## Licence
 
 MIT

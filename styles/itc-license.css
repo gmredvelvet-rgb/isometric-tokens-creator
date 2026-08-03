@@ -1,9 +1,8 @@
 /* ==========================================================================
-   Velvet Journals — licence / free-trial card
+   Isometric Token Creator — licence / free-trial card
 
-   Lives on <body>, outside the journal application, so it cannot inherit the
-   per-journal theme variables and commits to the Belle Époque noir & gold of
-   the module's own dialogs.
+   Lives on <body>, outside the editor application, so it cannot inherit the
+   editor's theme variables and commits to the module's own dialog palette.
    ========================================================================== */
 
 .itc-license-card {
